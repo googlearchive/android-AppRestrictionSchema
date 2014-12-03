@@ -11,6 +11,6 @@ solutions:    [Mobile]
 github:       android-AppRestrictionSchema
 level:        ADVANCED
 icon:         Application/main/big_icon.png
-api_refs:
+apiRefs:
     - android:android.content.RestrictionsManager
 license: apache2
