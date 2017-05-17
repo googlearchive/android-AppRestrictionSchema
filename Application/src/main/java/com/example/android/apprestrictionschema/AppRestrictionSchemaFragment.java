@@ -16,7 +16,10 @@
 
 package com.example.android.apprestrictionschema;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.RestrictionEntry;
 import android.content.RestrictionsManager;
 import android.os.Build;
@@ -44,7 +47,7 @@ import java.util.List;
 public class AppRestrictionSchemaFragment extends Fragment implements View.OnClickListener {
 
     // Tag for the logger
-    private static final String TAG = "AppRestrictionSchemaFragment";
+    private static final String TAG = "AppRestrictionSchema";
 
     private static final String KEY_CAN_SAY_HELLO = "can_say_hello";
     private static final String KEY_MESSAGE = "message";
@@ -59,6 +62,9 @@ public class AppRestrictionSchemaFragment extends Fragment implements View.OnCli
 
     // Message to show when the button is clicked (String restriction)
     private String mMessage;
+
+    // Observes restriction changes
+    private BroadcastReceiver mBroadcastReceiver;
 
     // UI Components
     private TextView mTextSayHello;
@@ -94,6 +100,28 @@ public class AppRestrictionSchemaFragment extends Fragment implements View.OnCli
     public void onResume() {
         super.onResume();
         resolveRestrictions();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                resolveRestrictions();
+            }
+        };
+        getActivity().registerReceiver(mBroadcastReceiver,
+                new IntentFilter(Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED));
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mBroadcastReceiver != null) {
+            getActivity().unregisterReceiver(mBroadcastReceiver);
+            mBroadcastReceiver = null;
+        }
     }
 
     private void resolveRestrictions() {
